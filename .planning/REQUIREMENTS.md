@@ -73,12 +73,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| TELM-01 | Phase 2 | Pending |
+| TELM-02 | Phase 1 | Pending |
+| ACCS-01 | Phase 1 | Pending |
+| ACCS-02 | Phase 5 | Pending |
+| MON-01 | Phase 2 | Pending |
+| MON-02 | Phase 2 | Pending |
+| MON-03 | Phase 2 | Pending |
+| ANLY-01 | Phase 3 | Pending |
+| ANLY-02 | Phase 3 | Pending |
+| ANLY-03 | Phase 3 | Pending |
+| ALRM-01 | Phase 4 | Pending |
+| ALRM-02 | Phase 4 | Pending |
+| ALRM-03 | Phase 4 | Pending |
+| CTRL-01 | Phase 5 | Pending |
+| CTRL-02 | Phase 5 | Pending |
+| CTRL-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16
+- Mapped to phases: 16
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-03-31 after initial definition*
+*Last updated: 2026-03-31 after roadmap creation*
