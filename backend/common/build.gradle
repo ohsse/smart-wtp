@@ -14,6 +14,8 @@ dependencies {
     // p6spy SQL 로깅 (api/scheduler 모듈로 전이)
     api 'p6spy:p6spy:3.9.1'
     // SQL pretty-print용 (CustomP6SpySqlFormatter에서 BasicFormatterImpl 사용)
+    // compileOnly: api/scheduler가 spring-boot-starter-data-jpa를 통해 hibernate-core를 런타임에 제공하므로
+    // common 모듈에 runtime 전이를 중복 추가하지 않음. JPA 의존성이 제거되면 implementation으로 전환 필요.
     compileOnly 'org.hibernate.orm:hibernate-core:7.0.0.Final'
 
     annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'

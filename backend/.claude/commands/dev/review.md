@@ -7,10 +7,13 @@
 ## 전제조건 검증
 1. `$ARGUMENTS`가 비어 있으면 "목적 슬러그를 인자로 전달하세요. 예: `/dev:review jwt_인증_추가`" 안내 후 중단
 2. RESULT 문서 탐색 (`docs/results/` 하위에서 슬러그 일치):
+   - 같은 날짜 디렉토리 내에서 **가장 큰 번호**의 RESULT 문서를 찾는다.
    - RESULT 문서가 없으면 → "결과 문서가 없습니다. `/dev:result $ARGUMENTS`를 먼저 실행하세요." 경고 후 중단
 3. 기준 날짜: RESULT 문서의 날짜를 재사용
-4. `docs/reviews/{날짜}/$ARGUMENTS/` 탐색:
+4. 현재 RESULT 번호가 N이면 REVIEW{N}을 생성한다 (RESULT1→REVIEW1, RESULT2→REVIEW2)
+5. `docs/reviews/{날짜}/$ARGUMENTS/` 탐색:
    - 기존 REVIEW 문서가 있으면 내용을 확인하여 블로커 해소 여부 재검토
+   - Fix cycle 진행 중이면 "관련 결과"에 이전 REVIEW 링크도 추가
 
 ## 코드 리뷰 수행
 
@@ -67,6 +70,8 @@ updated: YYYY-MM-DD
 ## 완료 후 안내
 
 리뷰 완료 후:
-- **블로커(높음) 발견 시**: `status: draft` 유지, 수정 후 `/dev:review $ARGUMENTS` 재실행 요청
+- **블로커(높음) 발견 시**: `status: draft` 유지
+  → "블로커 N건 발견. 수정 사이클을 시작하려면 `/dev $ARGUMENTS`를 실행하세요." 안내
+  → (fix cycle을 통해 PLAN{n+1}→TASK{n+1}→impl→RESULT{n+1}→REVIEW{n+1} 전체 흐름 수행)
 - **블로커 없음**: `status: approved`로 설정
   → "리뷰 완료, 블로커 없음. `/dev:commit $ARGUMENTS`를 실행하세요." 안내

@@ -18,6 +18,8 @@ sourceSets {
     }
 }
 
+// INCLUDE: resources-env/${profile}의 파일이 resources/ 기본 파일을 오버라이드하도록 허용.
+// Gradle은 나중에 추가된 srcDir(resources-env)의 파일을 우선 적용한다.
 tasks.named("processResources") {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }

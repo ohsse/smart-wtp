@@ -55,8 +55,14 @@ public class CustomP6SpySqlFormatter implements MessageFormattingStrategy {
             return "";
         }
 
-        LocalDateTime timestamp = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(Long.parseLong(now)), ZoneId.systemDefault());
+        // p6spy의 commit/rollback 카테고리에서 now가 빈 문자열로 전달될 수 있으므로 폴백 처리
+        LocalDateTime timestamp;
+        try {
+            timestamp = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(Long.parseLong(now)), ZoneId.systemDefault());
+        } catch (NumberFormatException e) {
+            timestamp = LocalDateTime.now();
+        }
 
         return String.format(
                 "%s | %dms | %s | connection %d%n%s",
