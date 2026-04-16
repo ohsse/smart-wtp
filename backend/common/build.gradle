@@ -1,0 +1,41 @@
+plugins {
+    id 'java-library'
+}
+
+def generatedDir = "${buildDir}/generated/sources/annotationProcessor/java/main"
+
+dependencies {
+    compileOnly 'jakarta.persistence:jakarta.persistence-api:3.2.0'
+
+    api 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.43'
+    implementation 'com.querydsl:querydsl-core:5.1.0'
+    api 'io.jsonwebtoken:jjwt-api:0.12.7'
+
+    // p6spy SQL 로깅 (api/scheduler 모듈로 전이)
+    api 'p6spy:p6spy:3.9.1'
+    // SQL pretty-print용 (CustomP6SpySqlFormatter에서 BasicFormatterImpl 사용)
+    compileOnly 'org.hibernate.orm:hibernate-core:7.0.0.Final'
+
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.2.0'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+
+    testRuntimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.7'
+    testRuntimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.7'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedDir
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(generatedDir))
+}
+
+tasks.named('clean') {
+    delete file(generatedDir)
+}

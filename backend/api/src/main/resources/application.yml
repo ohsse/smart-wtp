@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: smart-wtp-api
+  datasource:
+    url: jdbc:p6spy:postgresql://localhost:5432/smartwtp
+    username: smartwtp
+    password: smartwtp
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        # p6spy가 SQL 포매팅 및 파라미터 바인딩을 담당하므로 비활성화
+        format_sql: false
+        show_sql: false
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8080
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET:smart-wtp-jwt-secret-key-must-be-long-enough-2026}
+    issuer: ${JWT_ISSUER:smart-wtp-api}
+    access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:30}
+    refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:7}
+    exclude-paths:
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /swagger-ui.html
+      - /error
