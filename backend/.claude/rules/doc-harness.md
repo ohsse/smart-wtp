@@ -56,6 +56,39 @@ draft → review → approved → completed
 | `approved` | 사용자 승인 완료 (PLAN에서 다음 단계 진입 조건) |
 | `completed` | 작업 완료 |
 
+## 수정 사이클 (Fix Cycle)
+
+REVIEW에서 블로커(높음)가 발견되면, **동일 슬러그에 번호를 증가**한 새 문서를 생성하여 fix cycle을 수행한다.
+
+```
+1차 사이클: PLAN1 → TASK1 → impl → RESULT1 → REVIEW1 (블로커 발견)
+                                                       ↓
+2차 사이클: PLAN2 → TASK2 → impl → RESULT2 → REVIEW2 (승인)
+```
+
+### 번호 증가 규칙
+
+- 같은 날짜, 같은 슬러그 경로에 번호를 증가하여 생성한다.
+- 예: `docs/plan/20260416/p6spy_로깅정책/PLAN2.md`
+- PLAN{n}, TASK{n}, RESULT{n}, REVIEW{n}은 같은 fix cycle 번호 `n`으로 대응한다.
+
+### 상호 참조 규칙
+
+fix cycle 문서는 이전 REVIEW를 참조하여 트레이서빌리티를 유지한다.
+
+**PLAN{n}.md 헤더 (n ≥ 2):**
+```markdown
+## 배경
+- [이전 리뷰](../../../reviews/{YYYYMMDD}/{슬러그}/REVIEW{n-1}.md) 블로커 해소
+```
+
+**REVIEW{n}.md 헤더 (n ≥ 2):**
+```markdown
+## 관련 결과
+- [결과](../../../results/{YYYYMMDD}/{슬러그}/RESULT{n}.md)
+- [이전 리뷰](REVIEW{n-1}.md)
+```
+
 ## 문서 템플릿
 
 **PLAN{n}.md**

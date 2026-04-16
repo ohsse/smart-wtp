@@ -8,11 +8,12 @@
 1. `$ARGUMENTS`가 비어 있으면 "목적 슬러그를 인자로 전달하세요. 예: `/dev:task jwt_인증_추가`" 안내 후 중단
 2. PLAN 문서 탐색:
    - `docs/plan/` 하위에서 슬러그 `$ARGUMENTS`와 일치하는 디렉토리 탐색 (날짜 불문)
-   - 가장 최신 날짜의 PLAN 문서를 찾아 `status` 확인
+   - 같은 날짜 디렉토리 내에서 **가장 큰 번호**의 PLAN 문서(예: PLAN2.md > PLAN1.md)를 찾아 `status` 확인
    - `status: approved`가 아니면 → "계획이 아직 승인되지 않았습니다. `/dev:plan $ARGUMENTS`를 먼저 실행하고 승인받으세요." 경고 후 중단
 3. PLAN 문서의 날짜를 기준 날짜로 사용 (TASK도 동일 날짜 디렉토리에 생성)
-4. `docs/tasks/{날짜}/$ARGUMENTS/` 디렉토리 탐색:
-   - 기존 TASK 문서가 있으면 이어서 수정할지 확인
+4. 현재 PLAN 번호가 N이면 TASK{N}을 생성한다 (PLAN1→TASK1, PLAN2→TASK2)
+5. `docs/tasks/{날짜}/$ARGUMENTS/` 디렉토리 탐색:
+   - TASK{N} 문서가 이미 있으면 이어서 수정할지 확인
 
 ## TASK 문서 작성
 

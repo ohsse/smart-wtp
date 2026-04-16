@@ -7,8 +7,13 @@
 ## 전제조건 검증
 1. `$ARGUMENTS`가 비어 있으면 "목적 슬러그를 인자로 전달하세요. 예: `/dev:plan jwt_인증_추가`" 안내 후 중단
 2. 오늘 날짜를 YYYYMMDD 형식으로 확인
-3. `docs/plan/{오늘날짜}/$ARGUMENTS/` 디렉토리 탐색:
-   - `status: approved` 문서가 이미 존재하면 → "계획이 이미 승인되었습니다. `/dev:task $ARGUMENTS`를 실행하세요." 안내 후 중단
+3. `docs/reviews/` 하위에서 슬러그 일치 REVIEW 문서 탐색:
+   - 가장 최신 REVIEW가 `status: draft`이고 블로커(높음)가 있으면 → **Fix Cycle 모드**
+     - 기존 PLAN 중 가장 큰 번호 N을 파악하고, PLAN{N+1}.md 생성
+     - PLAN{N+1}의 "배경" 섹션에 REVIEW{N}의 블로커 항목을 참조
+     - 아래 "계획 문서 작성" 단계로 바로 진행
+4. `docs/plan/` 하위에서 슬러그 일치 디렉토리 탐색 (Fix Cycle 모드가 아닌 경우):
+   - `status: approved` 또는 `status: completed` 문서가 이미 존재하면 → "계획이 이미 승인되었습니다. `/dev:task $ARGUMENTS`를 실행하세요." 안내 후 중단
    - `status: draft` 또는 `status: review` 문서가 존재하면 → 해당 문서를 이어서 작성
    - 다른 날짜 디렉토리에 같은 슬러그의 문서가 있는지도 확인
 
