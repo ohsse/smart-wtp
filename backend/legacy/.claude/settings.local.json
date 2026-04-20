@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la *.xlsx)",
+      "Bash(python -c \"import openpyxl; print\\(''openpyxl available''\\)\")",
+      "Bash(python -c \"import xlrd; print\\(''xlrd available''\\)\")",
+      "Bash(python -c \"import pandas; print\\(''pandas available''\\)\")",
+      "Bash(python -c \"import openpyxl; print\\(''openpyxl OK'', openpyxl.__version__\\)\")",
+      "Bash(python gen_dict.py)",
+      "Bash(python:*)"
+    ]
+  }
+}

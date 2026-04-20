@@ -1,0 +1,43 @@
+#학야
+server:
+  port: 10016
+
+spring:
+  datasource:
+    #DB세팅
+    url: jdbc:mariadb://10.169.1.15:3306/PMS_DB
+    username: pms_user
+    password: pms2023
+    driver-class-name: org.mariadb.jdbc.Driver
+  kafka:
+    bootstrap-servers: 10.169.1.16:9092, 10.169.1.17:9092, 10.169.1.17:9094
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+
+
+##kafka setting
+kafka:
+  centerId: hakya
+  #topic
+  topic:
+    scada1:
+      name: FHYWGS1_data
+    scada2:
+      name: FHYWGS2_data
+    scada3:
+      name: FHYWGS_PMS_rawdata
+  #group id
+  group:
+    scada1:
+      id: FHYWGS1_PMS_rawdata_240311_1
+    scada2:
+      id: FHYWGS2_PMS_rawdata_240311_1
+    scada3:
+      id: FHYWGS_PMS_rawdata_240729_1
+  new:
+    group:
+      id: FHYWGS_PMS_rawdata_first_1
+
