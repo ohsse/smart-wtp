@@ -106,6 +106,29 @@ GIT_SKIP_DOC_CHECK=1 git commit -m "..."   # 검증 생략
 
 > 네이밍 컨벤션 상세 (Java 클래스, DB 테이블/컬럼): [.claude/rules/naming.md](.claude/rules/naming.md)
 
+### 도메인 모델링 시 필수 참조
+
+엔티티·DTO·DB 테이블을 신규 설계하거나 기존 모델을 수정할 때는 반드시 아래 세 문서를 먼저 확인한다.
+
+| 문서 | 참조 시점 |
+|------|----------|
+| [도메인 용어 사전](.claude/rules/domain-glossary.md) | 엔티티·컬럼·필드 명명 전 |
+| [DB 운영 패턴](.claude/rules/db-patterns.md) | DB 스키마 설계·마이그레이션·쿼리 작성 전 |
+| [레거시 매핑 규칙](.claude/rules/legacy-mapping.md) | 레거시 EMS/PMS 테이블 대응 신규 설계 전, PLAN 도메인 모델 섹션 작성 전 |
+
+- 용어 사전에 없는 신규 용어를 도입할 경우 `domain-glossary.md`에 먼저 추가한다.
+- PLAN 문서 작성 시에도 도메인 모델·DB 설계 변경이 수반되면 위 문서들을 참조한다.
+
+### 아키텍처·테스트 참조
+
+설비 통합, 지자체 배포, 테스트 설계 시 아래 문서를 참조한다.
+
+| 문서 | 참조 시점 |
+|------|----------|
+| [지자체별 멀티테넌트 배포](.claude/rules/multi-tenant.md) | 지자체별 배포 구조 설계, resources-env 파일 추가 전 |
+| [OT 연동 가이드](.claude/rules/ot-integration.md) | SCADA 수신·PLC 제어 어댑터 설계 전 |
+| [테스트 전략](.claude/rules/test-strategy.md) | 테스트 작성·TestContainers·시계열 픽스처 설계 전 |
+
 ---
 
 ## 패키지 규칙

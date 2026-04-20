@@ -48,6 +48,7 @@ TASK 파일이 있는 경우 미완료 항목(`- [ ]`)을 순서대로 구현한
 - **서비스/리포지토리**: `.claude/rules/api-patterns.md` 패턴 준수
 - **네이밍**: `.claude/rules/naming.md` 컨벤션 준수
 - **API**: Swagger `@Tag`, `@Operation`, `@ApiResponses` 어노테이션 작성
+- **테스트**: `.claude/rules/test-strategy.md` — 3계층 분리·시계열 픽스처·도메인 시나리오 기준 준수
 
 ### 예외/응답 처리
 - 비즈니스 예외: `RestApiException` 사용

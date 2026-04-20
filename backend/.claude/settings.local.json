@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(git config:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(find C:/dev/workspace/smart-wtp-codex/backend/api/src -name *.java -type f)",
+      "Bash(find C:/dev/workspace/smart-wtp-codex/backend/reference -name *.java -path */entity/* -type f)",
+      "Bash(find C:/dev/workspace/smart-wtp-codex/backend/reference -name *.java -type f)"
     ]
   },
   "hooks": {

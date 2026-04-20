@@ -36,6 +36,7 @@ public class Dataset extends DomainEventEntity {
 }
 ```
 
+
 ## 규칙 요약
 
 - `@Getter`만 사용, `@Setter` 사용 금지
