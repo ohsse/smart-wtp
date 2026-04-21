@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartwtp
+    username: smartwtp
+    password: smartwtp
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      # 테스트 실행 시 스키마 자동 생성, 종료 시 삭제
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
