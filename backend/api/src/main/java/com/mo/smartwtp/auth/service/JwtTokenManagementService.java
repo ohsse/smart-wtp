@@ -20,16 +20,24 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * JWT 토큰 발급·회전·폐기·검증 서비스.
+ *
+ * <p>리프레시 토큰의 등록자·수정자는 JPA Auditing 이 자동 주입한다.</p>
+ */
 @Service
 @Transactional(readOnly = true)
 public class JwtTokenManagementService {
 
-    /** 시스템이 자동 발급·회전·폐기하는 토큰의 감사 주체 */
-    private static final String AUDIT_ACTOR = "system";
-
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenHelper jwtTokenHelper;
 
+    /**
+     * JWT 토큰 관리 서비스를 생성한다.
+     *
+     * @param refreshTokenRepository 리프레시 토큰 저장소
+     * @param jwtTokenHelper         JWT 토큰 헬퍼
+     */
     public JwtTokenManagementService(
             RefreshTokenRepository refreshTokenRepository,
             JwtTokenHelper jwtTokenHelper
@@ -38,6 +46,13 @@ public class JwtTokenManagementService {
         this.jwtTokenHelper = jwtTokenHelper;
     }
 
+    /**
+     * Access Token / Refresh Token 쌍을 발급한다.
+     *
+     * @param subject 토큰 주체 (userId)
+     * @param claims  추가 클레임
+     * @return 발급된 토큰 쌍
+     */
     @Transactional
     public JwtToken issueTokens(String subject, Map<String, Object> claims) {
         JwtToken tokenPair = jwtTokenHelper.generateTokenPair(subject, claims);
@@ -46,15 +61,25 @@ public class JwtTokenManagementService {
 
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(subject)
                 .map(existing -> {
-                    existing.rotate(refreshTokenHash, refreshTokenExpiresAt, null, AUDIT_ACTOR);
+                    existing.rotate(refreshTokenHash, refreshTokenExpiresAt, null);
                     return existing;
                 })
-                .orElseGet(() -> RefreshToken.create(subject, refreshTokenHash, refreshTokenExpiresAt, AUDIT_ACTOR));
+                .orElseGet(() -> RefreshToken.create(subject, refreshTokenHash, refreshTokenExpiresAt));
 
         refreshTokenRepository.save(refreshToken);
         return tokenPair;
     }
 
+    /**
+     * 리프레시 토큰을 회전하여 새 AT/RT 쌍을 발급한다.
+     *
+     * @param refreshToken 클라이언트가 제출한 리프레시 토큰 원본
+     * @return 새로 발급된 토큰 쌍
+     * @throws RestApiException REFRESH_TOKEN_NOT_FOUND — 저장된 토큰 없음
+     * @throws RestApiException REFRESH_TOKEN_REVOKED — 이미 폐기된 토큰
+     * @throws RestApiException EXPIRED_TOKEN — 만료된 토큰
+     * @throws RestApiException REFRESH_TOKEN_MISMATCH — 해시 불일치
+     */
     @Transactional
     public JwtToken rotateRefreshToken(String refreshToken) {
         JwtTokenInspection inspection = validateRefreshToken(refreshToken);
@@ -79,24 +104,36 @@ public class JwtTokenManagementService {
         storedToken.rotate(
                 hashToken(newTokenPair.getRefreshToken()),
                 toLocalDateTime(jwtTokenHelper.inspect(newTokenPair.getRefreshToken()).expiresAt()),
-                now,
-                AUDIT_ACTOR
+                now
         );
         refreshTokenRepository.save(storedToken);
         return newTokenPair;
     }
 
+    /**
+     * 리프레시 토큰을 폐기한다 (로그아웃).
+     *
+     * @param subject 토큰 주체 (userId)
+     */
     @Transactional
     public void revokeRefreshToken(String subject) {
         refreshTokenRepository.findByUserId(subject)
                 .ifPresent(token -> {
                     if (!token.isRevoked()) {
-                        token.revoke(LocalDateTime.now(), AUDIT_ACTOR);
+                        token.revoke(LocalDateTime.now());
                         refreshTokenRepository.save(token);
                     }
                 });
     }
 
+    /**
+     * Access Token 을 검증하고 검사 결과를 반환한다.
+     *
+     * @param token Access Token 원본
+     * @return 토큰 검사 결과
+     * @throws RestApiException EXPIRED_TOKEN — 만료됨
+     * @throws RestApiException INVALID_TOKEN — 서명 불일치·타입 오류
+     */
     public JwtTokenInspection validateAccessToken(String token) {
         JwtTokenInspection inspection = jwtTokenHelper.inspect(token);
         if (inspection.status() == JwtTokenStatus.EXPIRED) {

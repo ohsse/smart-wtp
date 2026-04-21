@@ -47,7 +47,7 @@ class AuthServiceTest {
 
     @Test
     void 로그인_성공_시_토큰이_발급된다() {
-        User user = User.create("admin", "관리자", "$2a$encoded", UserRole.ADMIN, "system");
+        User user = User.create("admin", "관리자", "$2a$encoded", UserRole.ADMIN);
         JwtToken tokenPair = JwtToken.builder().accessToken("at").refreshToken("rt").build();
         Instant now = Instant.now();
         JwtTokenInspection mockInspection =
@@ -77,7 +77,7 @@ class AuthServiceTest {
 
     @Test
     void BCrypt_불일치_시_LOGIN_FAILED_예외가_발생한다() {
-        User user = User.create("admin", "관리자", "$2a$encoded", UserRole.ADMIN, "system");
+        User user = User.create("admin", "관리자", "$2a$encoded", UserRole.ADMIN);
         given(userRepository.findByUserIdAndUseYn("admin", "Y")).willReturn(Optional.of(user));
         given(passwordEncoder.matches("wrongPw", "$2a$encoded")).willReturn(false);
 

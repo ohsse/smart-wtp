@@ -17,10 +17,13 @@ import org.springframework.data.domain.Persistable;
  * 사용자 마스터 엔티티.
  *
  * <p>비밀번호는 BCrypt 인코딩된 값만 저장하며 원본은 저장하지 않는다.
- * 삭제는 {@link #deactivate(String)}을 통한 논리 삭제만 허용한다.</p>
+ * 삭제는 {@link #deactivate()}를 통한 논리 삭제만 허용한다.</p>
  *
  * <p>PK({@code user_id})는 외부에서 할당되므로 {@link Persistable}을 구현한다.
  * {@code isNew()} 판정은 {@link BaseEntity}의 {@code newEntity} 플래그에 위임한다.</p>
+ *
+ * <p>등록자({@code rgstr_id})·수정자({@code updt_id})·등록일시·수정일시는
+ * {@link BaseEntity} 의 JPA Auditing 으로 자동 주입된다.</p>
  */
 @Entity
 @Table(name = "user_m")
@@ -50,14 +53,6 @@ public class User extends BaseEntity implements Persistable<String> {
     @Column(name = "use_yn", nullable = false, length = 1)
     private String useYn;
 
-    /** 등록자 ID */
-    @Column(name = "rgstr_id", length = 50)
-    private String rgstrId;
-
-    /** 수정자 ID */
-    @Column(name = "updt_id", length = 50)
-    private String updtId;
-
     /**
      * {@inheritDoc} — PK를 반환한다.
      */
@@ -67,53 +62,45 @@ public class User extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * 신규 사용자를 생성한다.
+     * 신규 사용자를 생성한다. 등록자·수정자는 JPA Auditing 이 자동 주입한다.
      *
-     * @param userId      사용자 ID
-     * @param userNm      사용자 이름
-     * @param encodedPw   BCrypt 인코딩된 비밀번호
-     * @param role        권한 역할
-     * @param registrarId 등록자 ID
+     * @param userId    사용자 ID
+     * @param userNm    사용자 이름
+     * @param encodedPw BCrypt 인코딩된 비밀번호
+     * @param role      권한 역할
      */
-    public static User create(String userId, String userNm, String encodedPw, UserRole role, String registrarId) {
-        return new User(userId, userNm, encodedPw, role, "Y", registrarId, registrarId);
+    public static User create(String userId, String userNm, String encodedPw, UserRole role) {
+        return new User(userId, userNm, encodedPw, role, "Y");
     }
 
     /**
      * 비밀번호를 변경한다.
      *
      * @param encodedPw 새 BCrypt 인코딩 비밀번호
-     * @param updaterId 수정자 ID
      */
-    public void changePw(String encodedPw, String updaterId) {
+    public void changePw(String encodedPw) {
         this.userPw = encodedPw;
-        this.updtId = updaterId;
     }
 
     /**
      * 사용자 기본 정보를 변경한다.
      *
-     * @param userNm    변경할 이름 (null이면 유지)
-     * @param userRole  변경할 권한 (null이면 유지)
-     * @param updaterId 수정자 ID
+     * @param userNm   변경할 이름 (null이면 유지)
+     * @param userRole 변경할 권한 (null이면 유지)
      */
-    public void changeInfo(String userNm, UserRole userRole, String updaterId) {
+    public void changeInfo(String userNm, UserRole userRole) {
         if (userNm != null) {
             this.userNm = userNm;
         }
         if (userRole != null) {
             this.userRole = userRole;
         }
-        this.updtId = updaterId;
     }
 
     /**
      * 사용자를 비활성화(논리 삭제)한다.
-     *
-     * @param updaterId 수정자 ID
      */
-    public void deactivate(String updaterId) {
+    public void deactivate() {
         this.useYn = "N";
-        this.updtId = updaterId;
     }
 }

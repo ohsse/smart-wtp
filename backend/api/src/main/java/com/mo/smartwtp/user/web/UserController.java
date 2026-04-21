@@ -52,8 +52,8 @@ public class UserController extends CommonController {
             @Valid @RequestBody UserUpsertDto dto,
             HttpServletRequest request
     ) {
-        String registrarId = roleGuard.requireAdmin(request);
-        userService.registerUser(dto, registrarId);
+        roleGuard.requireAdmin(request);
+        userService.registerUser(dto);
         return getResponseEntity();
     }
 
@@ -84,8 +84,8 @@ public class UserController extends CommonController {
             @Valid @RequestBody UserUpsertDto dto,
             HttpServletRequest request
     ) {
-        String updaterId = roleGuard.requireAdmin(request);
-        userService.updateUser(userId, dto, updaterId);
+        roleGuard.requireAdmin(request);
+        userService.updateUser(userId, dto);
         return getResponseEntity();
     }
 
@@ -102,8 +102,8 @@ public class UserController extends CommonController {
             @PathVariable String userId,
             HttpServletRequest request
     ) {
-        String updaterId = roleGuard.requireAdmin(request);
-        userService.deactivateUser(userId, updaterId);
+        roleGuard.requireAdmin(request);
+        userService.deactivateUser(userId);
         return getResponseEntity();
     }
 }

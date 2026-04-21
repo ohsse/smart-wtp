@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
  *
  * <p>토큰 원본은 저장하지 않고 SHA-256 해시값만 보관한다.
  * 1계정 1토큰 정책 — {@code user_id} 가 유니크 키 역할을 한다.</p>
+ *
+ * <p>등록자({@code rgstr_id})·수정자({@code updt_id})·등록일시·수정일시는
+ * {@link BaseEntity} 의 JPA Auditing 으로 자동 주입된다.</p>
  */
 @Entity
 @Table(name = "refresh_token_p")
@@ -52,24 +55,15 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "last_used_dtm")
     private LocalDateTime lastUsedDtm;
 
-    /** 등록자 ID */
-    @Column(name = "rgstr_id", length = 50)
-    private String rgstrId;
-
-    /** 수정자 ID */
-    @Column(name = "updt_id", length = 50)
-    private String updtId;
-
     /**
-     * 새 리프레시 토큰 레코드를 생성한다.
+     * 새 리프레시 토큰 레코드를 생성한다. 등록자·수정자는 JPA Auditing 이 자동 주입한다.
      *
-     * @param userId      사용자 ID
-     * @param tokenHash   SHA-256 해시된 토큰값
-     * @param exprDtm     만료 일시
-     * @param registrarId 등록자 ID
+     * @param userId    사용자 ID
+     * @param tokenHash SHA-256 해시된 토큰값
+     * @param exprDtm   만료 일시
      */
-    public static RefreshToken create(String userId, String tokenHash, LocalDateTime exprDtm, String registrarId) {
-        return new RefreshToken(null, userId, tokenHash, exprDtm, null, null, registrarId, registrarId);
+    public static RefreshToken create(String userId, String tokenHash, LocalDateTime exprDtm) {
+        return new RefreshToken(null, userId, tokenHash, exprDtm, null, null);
     }
 
     /**
@@ -89,30 +83,26 @@ public class RefreshToken extends BaseEntity {
     }
 
     /**
-     * 토큰을 갱신한다 (리프레시 토큰 로테이션).
+     * 토큰을 갱신한다 (리프레시 토큰 로테이션). 수정자는 JPA Auditing 이 자동 주입한다.
      *
      * @param tokenHash   새 SHA-256 해시된 토큰값
      * @param exprDtm     새 만료 일시
      * @param lastUsedDtm 마지막 사용 일시
-     * @param updaterId   수정자 ID
      */
-    public void rotate(String tokenHash, LocalDateTime exprDtm, LocalDateTime lastUsedDtm, String updaterId) {
+    public void rotate(String tokenHash, LocalDateTime exprDtm, LocalDateTime lastUsedDtm) {
         this.tokenHash = tokenHash;
         this.exprDtm = exprDtm;
         this.lastUsedDtm = lastUsedDtm;
         this.revokeDtm = null;
-        this.updtId = updaterId;
     }
 
     /**
-     * 토큰을 폐기한다 (로그아웃).
+     * 토큰을 폐기한다 (로그아웃). 수정자는 JPA Auditing 이 자동 주입한다.
      *
      * @param revokeDtm 폐기 일시
-     * @param updaterId 수정자 ID
      */
-    public void revoke(LocalDateTime revokeDtm, String updaterId) {
+    public void revoke(LocalDateTime revokeDtm) {
         this.revokeDtm = revokeDtm;
         this.lastUsedDtm = revokeDtm;
-        this.updtId = updaterId;
     }
 }

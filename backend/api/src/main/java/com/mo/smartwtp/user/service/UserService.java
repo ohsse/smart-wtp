@@ -36,44 +36,41 @@ public class UserService {
     }
 
     /**
-     * 신규 사용자를 등록한다.
+     * 신규 사용자를 등록한다. 등록자·수정자는 JPA Auditing 이 자동 주입한다.
      *
-     * @param dto         등록 요청 DTO
-     * @param registrarId 등록자 ID
+     * @param dto 등록 요청 DTO
      * @throws RestApiException DUPLICATE_USER_ID — 동일 ID가 이미 존재하는 경우
      */
     @Transactional
-    public void registerUser(UserUpsertDto dto, String registrarId) {
+    public void registerUser(UserUpsertDto dto) {
         if (userRepository.existsById(dto.getUserId())) {
             throw new RestApiException(UserErrorCode.DUPLICATE_USER_ID);
         }
         String encodedPw = passwordEncoder.encode(dto.getUserPw());
-        User user = User.create(dto.getUserId(), dto.getUserNm(), encodedPw, dto.getUserRole(), registrarId);
+        User user = User.create(dto.getUserId(), dto.getUserNm(), encodedPw, dto.getUserRole());
         userRepository.save(user);
     }
 
     /**
-     * 사용자 정보를 수정한다 (비밀번호 제외).
+     * 사용자 정보를 수정한다 (비밀번호 제외). 수정자는 JPA Auditing 이 자동 주입한다.
      *
-     * @param userId      수정 대상 사용자 ID
-     * @param dto         수정 요청 DTO (null 필드는 유지)
-     * @param updaterId   수정자 ID
+     * @param userId 수정 대상 사용자 ID
+     * @param dto    수정 요청 DTO (null 필드는 유지)
      */
     @Transactional
-    public void updateUser(String userId, UserUpsertDto dto, String updaterId) {
+    public void updateUser(String userId, UserUpsertDto dto) {
         User user = findActiveUser(userId);
-        user.changeInfo(dto.getUserNm(), dto.getUserRole(), updaterId);
+        user.changeInfo(dto.getUserNm(), dto.getUserRole());
     }
 
     /**
-     * 사용자를 비활성화(논리 삭제)한다.
+     * 사용자를 비활성화(논리 삭제)한다. 수정자는 JPA Auditing 이 자동 주입한다.
      *
-     * @param userId    비활성화 대상 사용자 ID
-     * @param updaterId 수정자 ID
+     * @param userId 비활성화 대상 사용자 ID
      */
     @Transactional
-    public void deactivateUser(String userId, String updaterId) {
+    public void deactivateUser(String userId) {
         User user = findActiveUser(userId);
-        user.deactivate(updaterId);
+        user.deactivate();
     }
 }
