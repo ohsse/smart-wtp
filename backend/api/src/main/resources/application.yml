@@ -27,10 +27,12 @@ auth:
   jwt:
     secret: ${JWT_SECRET:smart-wtp-jwt-secret-key-must-be-long-enough-2026}
     issuer: ${JWT_ISSUER:smart-wtp-api}
-    access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:30}
+    access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:60}
     refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:7}
     exclude-paths:
       - /swagger-ui/**
       - /v3/api-docs/**
       - /swagger-ui.html
       - /error
+      - /api/auth/login
+      - /api/auth/refresh

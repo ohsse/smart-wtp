@@ -12,6 +12,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * JWT 리프레시 토큰 엔티티.
+ *
+ * <p>토큰 원본은 저장하지 않고 SHA-256 해시값만 보관한다.
+ * 1계정 1토큰 정책 — subject가 유니크 키 역할을 한다.</p>
+ */
 @Entity
 @Table(name = "auth_refresh_token")
 @Getter
@@ -23,42 +29,58 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "token_id", nullable = false, length = 36)
     private String tokenId;
 
+    /** 토큰 주체 (사용자 식별자) */
     @Column(name = "subject", nullable = false, length = 100)
     private String subject;
 
+    /** SHA-256 해시된 토큰값 */
     @Column(name = "token_hash", nullable = false, length = 64)
     private String tokenHash;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    /** 토큰 만료 일시 */
+    @Column(name = "expr_dtm", nullable = false)
+    private LocalDateTime exprDtm;
 
-    @Column(name = "revoked_at")
-    private LocalDateTime revokedAt;
+    /** 토큰 폐기 일시 (null이면 활성) */
+    @Column(name = "revoke_dtm")
+    private LocalDateTime revokeDtm;
 
-    @Column(name = "last_used_at")
-    private LocalDateTime lastUsedAt;
+    /** 마지막 사용 일시 */
+    @Column(name = "last_used_dtm")
+    private LocalDateTime lastUsedDtm;
 
-    public static RefreshToken create(String subject, String tokenHash, LocalDateTime expiresAt) {
-        return new RefreshToken(UUID.randomUUID().toString(), subject, tokenHash, expiresAt, null, null);
+    /**
+     * 새 리프레시 토큰 레코드를 생성한다.
+     */
+    public static RefreshToken create(String subject, String tokenHash, LocalDateTime exprDtm) {
+        return new RefreshToken(UUID.randomUUID().toString(), subject, tokenHash, exprDtm, null, null);
     }
 
+    /** 폐기 여부 확인 */
     public boolean isRevoked() {
-        return revokedAt != null;
+        return revokeDtm != null;
     }
 
+    /** 만료 여부 확인 */
     public boolean isExpired(LocalDateTime now) {
-        return expiresAt.isBefore(now);
+        return exprDtm.isBefore(now);
     }
 
-    public void rotate(String tokenHash, LocalDateTime expiresAt, LocalDateTime lastUsedAt) {
+    /**
+     * 토큰을 갱신한다 (리프레시 토큰 로테이션).
+     */
+    public void rotate(String tokenHash, LocalDateTime exprDtm, LocalDateTime lastUsedDtm) {
         this.tokenHash = tokenHash;
-        this.expiresAt = expiresAt;
-        this.lastUsedAt = lastUsedAt;
-        this.revokedAt = null;
+        this.exprDtm = exprDtm;
+        this.lastUsedDtm = lastUsedDtm;
+        this.revokeDtm = null;
     }
 
-    public void revoke(LocalDateTime revokedAt) {
-        this.revokedAt = revokedAt;
-        this.lastUsedAt = revokedAt;
+    /**
+     * 토큰을 폐기한다 (로그아웃).
+     */
+    public void revoke(LocalDateTime revokeDtm) {
+        this.revokeDtm = revokeDtm;
+        this.lastUsedDtm = revokeDtm;
     }
 }

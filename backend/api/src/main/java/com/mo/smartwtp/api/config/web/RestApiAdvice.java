@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +21,13 @@ public class RestApiAdvice {
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<CommonResponseDto<Void>> handleRestApiException(RestApiException exception) {
         return buildErrorResponse(exception.getErrorCode(), exception);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CommonResponseDto<Void>> handleValidationException(
+            MethodArgumentNotValidException exception
+    ) {
+        return buildErrorResponse(CommonErrorCode.INVALID_REQUEST, exception);
     }
 
     @ExceptionHandler({

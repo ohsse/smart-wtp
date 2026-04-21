@@ -164,6 +164,7 @@ PMS 및 EMS 공통으로 4단계 심각도를 사용한다.
 | `_prdct` | Prediction (예측값) | `pwr_prdct` |
 | `_rslt` | Result (결과) | `diag_rslt` |
 | `_unit` | Unit (단위) | `pwr_unit` |
+| `_pw` | Password (비밀번호) | `user_pw` |
 | `_dtm` | Datetime (일시) | `rgstr_dtm`, `updt_dtm` |
 | `_dt` | Date (날짜) | `acq_dt` |
 

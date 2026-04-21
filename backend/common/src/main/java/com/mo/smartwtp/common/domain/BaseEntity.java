@@ -19,12 +19,12 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
 
     /** 엔티티 최초 생성 일시 */
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "rgstr_dtm", nullable = false)
+    private LocalDateTime rgstrDtm;
 
     /** 엔티티 최종 수정 일시 */
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "updt_dtm", nullable = false)
+    private LocalDateTime updtDtm;
 
     /**
      * 최초 저장 시 생성/수정 일시를 현재 시각으로 설정한다.
@@ -32,8 +32,8 @@ public abstract class BaseEntity {
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.rgstrDtm = now;
+        this.updtDtm = now;
     }
 
     /**
@@ -41,6 +41,6 @@ public abstract class BaseEntity {
      */
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updtDtm = LocalDateTime.now();
     }
 }
