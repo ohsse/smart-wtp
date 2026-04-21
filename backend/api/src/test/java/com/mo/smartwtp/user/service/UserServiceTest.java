@@ -3,6 +3,9 @@ package com.mo.smartwtp.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.mo.smartwtp.auth.domain.RefreshToken;
+import com.mo.smartwtp.auth.repository.RefreshTokenRepository;
+import com.mo.smartwtp.auth.service.JwtTokenManagementService;
 import com.mo.smartwtp.auth.web.ApiErrorResponseWriter;
 import com.mo.smartwtp.common.exception.RestApiException;
 import com.mo.smartwtp.user.domain.User;
@@ -10,6 +13,7 @@ import com.mo.smartwtp.user.domain.UserRole;
 import com.mo.smartwtp.user.dto.UserUpsertDto;
 import com.mo.smartwtp.user.exception.UserErrorCode;
 import com.mo.smartwtp.user.repository.UserRepository;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -46,6 +51,12 @@ class UserServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private JwtTokenManagementService jwtTokenManagementService;
 
     private UserUpsertDto buildDto(String userId, String userNm, String userPw, UserRole role) {
         UserUpsertDto dto = new UserUpsertDto();
@@ -128,6 +139,55 @@ class UserServiceTest {
         userService.deactivateUser("user02");
 
         assertThatThrownBy(() -> userService.findActiveUser("user02"))
+                .isInstanceOf(RestApiException.class)
+                .extracting(e -> ((RestApiException) e).getErrorCode())
+                .isEqualTo(UserErrorCode.USER_NOT_FOUND);
+    }
+
+    /**
+     * @TransactionalEventListener(BEFORE_COMMIT)은 트랜잭션이 실제로 커밋될 때만 동작한다.
+     * 클래스 레벨 @Transactional은 롤백되므로 NOT_SUPPORTED로 비활성화하고,
+     * 각 서비스 호출이 자체 트랜잭션을 커밋하도록 한다.
+     */
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void 사용자_비활성화_시_리프레시_토큰이_폐기된다() {
+        refreshTokenRepository.deleteByUserId("user10");
+        userRepository.deleteById("user10");
+
+        userService.registerUser(buildDto("user10", "이벤트유저", "password", UserRole.USER));
+        jwtTokenManagementService.issueTokens("user10", Map.of("role", "USER"));
+
+        userService.deactivateUser("user10");
+
+        RefreshToken token = refreshTokenRepository.findByUserId("user10").orElseThrow();
+        assertThat(token.isRevoked()).isTrue();
+        assertThat(token.getRevokeDtm()).isNotNull();
+
+        refreshTokenRepository.deleteByUserId("user10");
+        userRepository.deleteById("user10");
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void 사용자_물리삭제_시_리프레시_토큰도_삭제된다() {
+        refreshTokenRepository.deleteByUserId("user11");
+        userRepository.deleteById("user11");
+
+        userService.registerUser(buildDto("user11", "삭제유저", "password", UserRole.USER));
+        jwtTokenManagementService.issueTokens("user11", Map.of("role", "USER"));
+
+        assertThat(refreshTokenRepository.findByUserId("user11")).isPresent();
+
+        userService.deleteUser("user11");
+
+        assertThat(userRepository.findById("user11")).isEmpty();
+        assertThat(refreshTokenRepository.findByUserId("user11")).isEmpty();
+    }
+
+    @Test
+    void 존재하지_않는_사용자_물리삭제_시_예외가_발생한다() {
+        assertThatThrownBy(() -> userService.deleteUser("nonexistent"))
                 .isInstanceOf(RestApiException.class)
                 .extracting(e -> ((RestApiException) e).getErrorCode())
                 .isEqualTo(UserErrorCode.USER_NOT_FOUND);

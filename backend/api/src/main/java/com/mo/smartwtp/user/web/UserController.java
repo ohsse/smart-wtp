@@ -106,4 +106,23 @@ public class UserController extends CommonController {
         userService.deactivateUser(userId);
         return getResponseEntity();
     }
+
+    @Operation(summary = "사용자 물리 삭제 (ADMIN 전용)",
+               description = "사용자 레코드를 DB에서 완전히 삭제한다. 연관 리프레시 토큰도 함께 삭제된다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "사용자 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @DeleteMapping("/{userId}/permanent")
+    public ResponseEntity<CommonResponseDto<Void>> deleteUser(
+            @PathVariable String userId,
+            HttpServletRequest request
+    ) {
+        roleGuard.requireAdmin(request);
+        userService.deleteUser(userId);
+        return getResponseEntity();
+    }
 }

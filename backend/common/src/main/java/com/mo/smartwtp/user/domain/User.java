@@ -1,6 +1,6 @@
 package com.mo.smartwtp.user.domain;
 
-import com.mo.smartwtp.common.domain.BaseEntity;
+import com.mo.smartwtp.common.domain.DomainEventEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,7 +30,7 @@ import org.springframework.data.domain.Persistable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class User extends BaseEntity implements Persistable<String> {
+public class User extends DomainEventEntity implements Persistable<String> {
 
     @Id
     @Column(name = "user_id", nullable = false, length = 50)

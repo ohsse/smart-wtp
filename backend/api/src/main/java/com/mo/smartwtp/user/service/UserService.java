@@ -3,6 +3,7 @@ package com.mo.smartwtp.user.service;
 import com.mo.smartwtp.common.exception.RestApiException;
 import com.mo.smartwtp.user.domain.User;
 import com.mo.smartwtp.user.dto.UserUpsertDto;
+import com.mo.smartwtp.user.event.UserEventPublisher;
 import com.mo.smartwtp.user.exception.UserErrorCode;
 import com.mo.smartwtp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserEventPublisher userEventPublisher;
 
     /**
      * 활성 사용자를 조회한다.
@@ -66,11 +68,31 @@ public class UserService {
     /**
      * 사용자를 비활성화(논리 삭제)한다. 수정자는 JPA Auditing 이 자동 주입한다.
      *
+     * <p>{@code UserDeactivatedEvent}를 발행하며, {@code UserEventHandler}가
+     * {@code BEFORE_COMMIT} 시점에 연관 리프레시 토큰을 폐기한다.</p>
+     *
      * @param userId 비활성화 대상 사용자 ID
      */
     @Transactional
     public void deactivateUser(String userId) {
         User user = findActiveUser(userId);
         user.deactivate();
+        userEventPublisher.deactivateAndPublish(user);
+    }
+
+    /**
+     * 사용자를 물리 삭제한다.
+     *
+     * <p>{@code UserDeletedEvent}를 발행하며, {@code UserEventHandler}가
+     * {@code BEFORE_COMMIT} 시점에 연관 리프레시 토큰을 먼저 삭제하여 FK 제약 위반을 방지한다.</p>
+     *
+     * @param userId 삭제 대상 사용자 ID
+     * @throws RestApiException USER_NOT_FOUND — 존재하지 않는 사용자 ID
+     */
+    @Transactional
+    public void deleteUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+        userEventPublisher.deleteAndPublish(user);
     }
 }
