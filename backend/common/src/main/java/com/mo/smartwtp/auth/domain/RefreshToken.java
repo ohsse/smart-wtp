@@ -21,6 +21,12 @@ import lombok.NoArgsConstructor;
  *
  * <p>등록자({@code rgstr_id})·수정자({@code updt_id})·등록일시·수정일시는
  * {@link BaseEntity} 의 JPA Auditing 으로 자동 주입된다.</p>
+ *
+ * <p>{@code User} 엔티티와의 1:1 관계는 의도적으로 JPA 연관관계로 매핑하지 않는다.
+ * 생명주기는 {@code UserEventHandler} 의 {@code UserDeactivatedEvent} /
+ * {@code UserDeletedEvent} {@code @TransactionalEventListener(BEFORE_COMMIT)} 리스너가 관리하며,
+ * DB 무결성은 {@code uk_refresh_token_p_user_id} UNIQUE 와 {@code fk_refresh_token_p_user_id}
+ * FK 로 강제한다.</p>
  */
 @Entity
 @Table(name = "refresh_token_p")
