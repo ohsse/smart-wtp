@@ -97,10 +97,10 @@ class JwtTokenManagementServiceTest {
 
     private RefreshTokenRepository inMemoryRepository(AtomicReference<RefreshToken> storedToken) {
         RefreshTokenRepository repository = mock(RefreshTokenRepository.class);
-        when(repository.findBySubject(any())).thenAnswer(invocation -> {
-            String subject = invocation.getArgument(0, String.class);
+        when(repository.findByUserId(any())).thenAnswer(invocation -> {
+            String userId = invocation.getArgument(0, String.class);
             RefreshToken token = storedToken.get();
-            if (token == null || !token.getSubject().equals(subject)) {
+            if (token == null || !token.getUserId().equals(userId)) {
                 return Optional.empty();
             }
             return Optional.of(token);

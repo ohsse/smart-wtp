@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class JwtTokenManagementService {
 
+    /** 시스템이 자동 발급·회전·폐기하는 토큰의 감사 주체 */
+    private static final String AUDIT_ACTOR = "system";
+
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenHelper jwtTokenHelper;
 
@@ -41,12 +44,12 @@ public class JwtTokenManagementService {
         String refreshTokenHash = hashToken(tokenPair.getRefreshToken());
         LocalDateTime refreshTokenExpiresAt = toLocalDateTime(jwtTokenHelper.inspect(tokenPair.getRefreshToken()).expiresAt());
 
-        RefreshToken refreshToken = refreshTokenRepository.findBySubject(subject)
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(subject)
                 .map(existing -> {
-                    existing.rotate(refreshTokenHash, refreshTokenExpiresAt, null);
+                    existing.rotate(refreshTokenHash, refreshTokenExpiresAt, null, AUDIT_ACTOR);
                     return existing;
                 })
-                .orElseGet(() -> RefreshToken.create(subject, refreshTokenHash, refreshTokenExpiresAt));
+                .orElseGet(() -> RefreshToken.create(subject, refreshTokenHash, refreshTokenExpiresAt, AUDIT_ACTOR));
 
         refreshTokenRepository.save(refreshToken);
         return tokenPair;
@@ -58,7 +61,7 @@ public class JwtTokenManagementService {
         String subject = inspection.subject();
         String inputTokenHash = hashToken(refreshToken);
 
-        RefreshToken storedToken = refreshTokenRepository.findBySubject(subject)
+        RefreshToken storedToken = refreshTokenRepository.findByUserId(subject)
                 .orElseThrow(() -> new RestApiException(JwtErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         LocalDateTime now = LocalDateTime.now();
@@ -76,7 +79,8 @@ public class JwtTokenManagementService {
         storedToken.rotate(
                 hashToken(newTokenPair.getRefreshToken()),
                 toLocalDateTime(jwtTokenHelper.inspect(newTokenPair.getRefreshToken()).expiresAt()),
-                now
+                now,
+                AUDIT_ACTOR
         );
         refreshTokenRepository.save(storedToken);
         return newTokenPair;
@@ -84,10 +88,10 @@ public class JwtTokenManagementService {
 
     @Transactional
     public void revokeRefreshToken(String subject) {
-        refreshTokenRepository.findBySubject(subject)
+        refreshTokenRepository.findByUserId(subject)
                 .ifPresent(token -> {
                     if (!token.isRevoked()) {
-                        token.revoke(LocalDateTime.now());
+                        token.revoke(LocalDateTime.now(), AUDIT_ACTOR);
                         refreshTokenRepository.save(token);
                     }
                 });
