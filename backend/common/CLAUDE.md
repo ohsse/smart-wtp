@@ -47,6 +47,7 @@
 - 기본 생성자는 `@NoArgsConstructor(access = AccessLevel.PROTECTED)`로 제한한다.
 - 전체 필드 생성자는 필요 시 `PRIVATE` 접근 수준을 사용한다.
 - PK는 `@GeneratedValue(strategy = GenerationType.UUID)`를 기본으로 사용한다.
+- 외부에서 PK를 할당받는 엔티티(`@GeneratedValue` 미사용)는 `Persistable<ID>`를 구현한다. `isNew()` 판정은 `BaseEntity`의 `@Transient newEntity` 플래그에 위임하고, `getId()`만 override한다. (상세: [entity-patterns.md](../.claude/rules/entity-patterns.md), 대상 도메인 예시: [legacy-mapping.md §3](../.claude/rules/legacy-mapping.md))
 - 공통 메타 정보가 필요하면 `BaseEntity` 상속, 이벤트 기능이 필요하면 `DomainEventEntity` 상속.
 - 상태 변경은 setter 대신 의도가 드러나는 메서드로 처리한다. (예: `changeInfo(...)`)
 - 엔티티 생성은 정적 팩토리 메서드를 우선 사용한다.

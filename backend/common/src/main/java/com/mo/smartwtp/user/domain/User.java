@@ -11,19 +11,23 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Persistable;
 
 /**
  * 사용자 마스터 엔티티.
  *
  * <p>비밀번호는 BCrypt 인코딩된 값만 저장하며 원본은 저장하지 않는다.
  * 삭제는 {@link #deactivate(String)}을 통한 논리 삭제만 허용한다.</p>
+ *
+ * <p>PK({@code user_id})는 외부에서 할당되므로 {@link Persistable}을 구현한다.
+ * {@code isNew()} 판정은 {@link BaseEntity}의 {@code newEntity} 플래그에 위임한다.</p>
  */
 @Entity
 @Table(name = "user_m")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Persistable<String> {
 
     @Id
     @Column(name = "user_id", nullable = false, length = 50)
@@ -53,6 +57,14 @@ public class User extends BaseEntity {
     /** 수정자 ID */
     @Column(name = "updt_id", length = 50)
     private String updtId;
+
+    /**
+     * {@inheritDoc} — PK를 반환한다.
+     */
+    @Override
+    public String getId() {
+        return userId;
+    }
 
     /**
      * 신규 사용자를 생성한다.
