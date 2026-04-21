@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: common
   datasource:
     url: ${DB_URL:jdbc:p6spy:postgresql://localhost:5432/smartwtp}
     username: ${DB_USERNAME:smartwtp}

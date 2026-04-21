@@ -1,0 +1,20 @@
+# api 모듈 공통 설정. 지자체 프로파일과 무관하게 항상 로드됨.
+# spring.profiles.include: common 을 통해 활성화된다.
+# 주의: auth.jwt.exclude-paths 를 프로파일 yml에서 재정의하면 리스트 전체가 교체된다.
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET:smart-wtp-jwt-secret-key-must-be-long-enough-2026}
+    issuer: ${JWT_ISSUER:smart-wtp-api}
+    access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:60}
+    refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:7}
+    exclude-paths:
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /swagger-ui.html
+      - /error
+      - /api/auth/login
+      - /api/auth/refresh

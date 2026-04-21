@@ -1,6 +1,8 @@
 spring:
   application:
     name: smart-wtp-scheduler
+  profiles:
+    include: common
   datasource:
     url: ${DB_URL:jdbc:p6spy:postgresql://localhost:5432/smartwtp}
     username: ${DB_USERNAME:smartwtp}
@@ -20,7 +22,3 @@ spring:
       enabled: false
   main:
     web-application-type: none
-
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
