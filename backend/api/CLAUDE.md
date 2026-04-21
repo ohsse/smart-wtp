@@ -87,6 +87,9 @@
 - 비즈니스 예외는 반드시 `RestApiException`으로 던지고 `ErrorCode` 구현 enum으로 관리한다.
 - 공통 예외 매핑은 `RestApiAdvice`에서 일원화하고, 컨트롤러별 중복 예외 처리를 만들지 않는다.
 - 에러 응답 바디는 `CommonResponseDto<Void>`를 사용한다.
+- `ErrorCode` 구현 enum은 `httpStatus`(int) 외 필드를 두지 않는다. `message` 등 사용자 표기 문자열 필드는 금지다. 사용자 표기 문구는 프론트엔드가 `errorCode.name()`으로 명세 기반 매핑한다.
+
+> 코드 패턴 예시: [../.claude/rules/exception-patterns.md](../.claude/rules/exception-patterns.md)
 
 ---
 

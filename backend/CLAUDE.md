@@ -41,57 +41,9 @@
 
 ## 작업 흐름
 
-### 작업 규모 분류
+개발 작업은 `/dev {슬러그}` 커맨드로 시작한다. 규모 분류(Small/Medium/Large), 단계별 정의(요청→계획→분해→구현→결과→리뷰→커밋), Fix Cycle 처리 등 상세는 `.claude/commands/dev.md`와 `.claude/commands/dev/*.md`를 참조한다.
 
-작업 규모에 따라 거쳐야 할 단계가 다르다.
-
-| 규모 | 기준 | 단계 |
-|------|------|------|
-| **Small** | 단일 파일 수정, 버그 픽스, 간단한 리팩토링 | 1 → 4 → 7 (문서 생략 가능) |
-| **Medium** | 단일 도메인 기능 추가/수정 | 1 → 2 → 3 → 4 → 7 |
-| **Large** | 다중 도메인, 아키텍처 변경, 대규모 재개발 | 1 → 2 → 3 → 4 → 5 → 6 → 7 |
-
-### 단계별 정의 및 전이 조건
-
-1. **요청 구체화**: 불확실한 요청은 질문을 통해 구체화한 뒤 진행한다.
-
-2. **계획 수립**: plan 모드로 계획을 수립하고, `docs/plan/YYYYMMDD/{작업목적}/PLAN1.md`에 작성한다.
-   - 산출물: `PLAN1.md` ([템플릿](.claude/rules/doc-harness.md))
-   - **전이 조건 → 3단계**: 사용자가 계획 문서를 확인하고 승인. 문서 상단 `status: approved`로 변경.
-
-3. **작업 분해**: 계획이 승인되면 `docs/tasks/YYYYMMDD/{작업목적}/TASK1.md`에 Phase/Task 목록을 작성한다.
-   - 산출물: `TASK1.md` ([템플릿](.claude/rules/doc-harness.md))
-   - **전이 조건 → 4단계**: TASK 문서의 Phase별 Task 목록 확정.
-
-4. **구현 및 검증**: 코드 작성 후 관련 모듈의 테스트를 실행하여 검증한다.
-   - **전이 조건 → 5단계**: `./gradlew.bat :{module}:test` 통과.
-
-5. **결과 정리**: `docs/results/YYYYMMDD/{작업목적}/RESULT1.md`에 변경 사항과 테스트 결과를 요약한다.
-   - 산출물: `RESULT1.md` ([템플릿](.claude/rules/doc-harness.md))
-   - **전이 조건 → 6단계**: RESULT 문서 작성 완료.
-
-6. **리뷰**: 별도 Reviewer를 spawn하여 검증하고, `docs/reviews/YYYYMMDD/{작업목적}/REVIEW1.md`에 기록한다.
-   - 산출물: `REVIEW1.md` ([템플릿](.claude/rules/doc-harness.md))
-   - **전이 조건 → 7단계**: REVIEW 문서에서 블로커(심각도 높음) 없음 확인.
-
-7. **커밋/PR**: 사용자 확인 없이 커밋하거나 PR을 생성하지 않는다.
-
-> 문서 디렉토리 구조, 파일 네이밍, 템플릿 상세: [.claude/rules/doc-harness.md](.claude/rules/doc-harness.md)
-
-### Claude Code 훅 (PreToolUse)
-
-`.claude/settings.local.json`에 `PreToolUse` 훅이 설정되어 있다. Claude Code가 `git commit`을 실행하기 전에 자동으로 동작한다.
-
-**동작**: `docs/tasks/` 하위의 미완료(`status != completed`) TASK 문서를 파싱하여, 해당 작업에 속한 파일이 staging에 있으면 자동으로 unstage한다. 남은 staged 파일이 없으면 커밋을 차단한다.
-
-**훅 스크립트**: `.claude/hooks/check-task-unstage.sh`
-
-**우회 방법**:
-```bash
-GIT_SKIP_DOC_CHECK=1 git commit -m "..."   # 검증 생략
-```
-
-**주의**: 이 훅은 Claude Code 세션 내에서만 동작한다. 터미널/IDE에서 직접 커밋할 때는 적용되지 않는다. TASK 문서의 파일 경로는 반드시 전체 상대 경로로 기록해야 훅이 정확히 동작한다. ([경로 기록 규칙](.claude/rules/doc-harness.md))
+pre-commit 훅은 `.claude/settings.local.json`에 설정되어 있으며, 미완료 TASK에 속한 파일을 자동 unstage한다. 동작 상세·우회 방법은 `.claude/hooks/check-task-unstage.sh` 상단 주석을 참조한다.
 
 ---
 
@@ -104,30 +56,25 @@ GIT_SKIP_DOC_CHECK=1 git commit -m "..."   # 검증 생략
 - 신규 작성 또는 수정한 클래스, 필드, 메서드에 Javadoc 형식 주석 작성
 - Swagger를 이용하여 API 명세를 남긴다
 
-> 네이밍 컨벤션 상세 (Java 클래스, DB 테이블/컬럼): [.claude/rules/naming.md](.claude/rules/naming.md)
+---
 
-### 도메인 모델링 시 필수 참조
+## 규칙 문서 인덱스
 
-엔티티·DTO·DB 테이블을 신규 설계하거나 기존 모델을 수정할 때는 반드시 아래 세 문서를 먼저 확인한다.
+| 영역 | 문서 | 참조 시점 |
+|------|------|----------|
+| 네이밍 컨벤션 | `.claude/rules/naming.md` | 클래스·DB 컬럼 명명 전 |
+| 엔티티 패턴 | `.claude/rules/entity-patterns.md` | 엔티티 설계·수정 전 |
+| API 패턴 | `.claude/rules/api-patterns.md` | Service·Repository·DTO·Swagger 작성 전 |
+| 도메인 용어 사전 | `.claude/rules/domain-glossary.md` | 엔티티·컬럼·필드 명명 전 |
+| DB 운영 패턴 | `.claude/rules/db-patterns.md` | DB 스키마 설계·마이그레이션·쿼리 작성 전 |
+| 레거시 매핑 규칙 | `.claude/rules/legacy-mapping.md` | 레거시 EMS/PMS 대응 신규 설계 전 |
+| 멀티테넌트 배포 | `.claude/rules/multi-tenant.md` | 지자체별 배포 구조 설계, resources-env 파일 추가 전 |
+| OT 연동 가이드 | `.claude/rules/ot-integration.md` | SCADA 수신·PLC 제어 어댑터 설계 전 |
+| 테스트 전략 | `.claude/rules/test-strategy.md` | 테스트 작성·TestContainers·시계열 픽스처 설계 전 |
+| 문서 하네스 | `.claude/rules/doc-harness.md` | PLAN/TASK/RESULT/REVIEW 문서 작성 전 |
+| 예외·에러 코드 패턴 | `.claude/rules/exception-patterns.md` | ErrorCode 설계·수정 전 |
 
-| 문서 | 참조 시점 |
-|------|----------|
-| [도메인 용어 사전](.claude/rules/domain-glossary.md) | 엔티티·컬럼·필드 명명 전 |
-| [DB 운영 패턴](.claude/rules/db-patterns.md) | DB 스키마 설계·마이그레이션·쿼리 작성 전 |
-| [레거시 매핑 규칙](.claude/rules/legacy-mapping.md) | 레거시 EMS/PMS 테이블 대응 신규 설계 전, PLAN 도메인 모델 섹션 작성 전 |
-
-- 용어 사전에 없는 신규 용어를 도입할 경우 `domain-glossary.md`에 먼저 추가한다.
-- PLAN 문서 작성 시에도 도메인 모델·DB 설계 변경이 수반되면 위 문서들을 참조한다.
-
-### 아키텍처·테스트 참조
-
-설비 통합, 지자체 배포, 테스트 설계 시 아래 문서를 참조한다.
-
-| 문서 | 참조 시점 |
-|------|----------|
-| [지자체별 멀티테넌트 배포](.claude/rules/multi-tenant.md) | 지자체별 배포 구조 설계, resources-env 파일 추가 전 |
-| [OT 연동 가이드](.claude/rules/ot-integration.md) | SCADA 수신·PLC 제어 어댑터 설계 전 |
-| [테스트 전략](.claude/rules/test-strategy.md) | 테스트 작성·TestContainers·시계열 픽스처 설계 전 |
+> **필수**: 엔티티·DTO·DB 테이블을 신규 설계하거나 수정할 때는 `domain-glossary.md`, `db-patterns.md`, `legacy-mapping.md` 세 문서를 먼저 확인한다. 용어 사전에 없는 신규 용어는 `domain-glossary.md`에 먼저 추가한다.
 
 ---
 
@@ -162,8 +109,7 @@ chore:    빌드/설정 변경
 test:     테스트 추가/수정
 ```
 
-- 커밋 메시지는 한국어로 작성한다.
-- 예: `feat: 사용자 인증 JWT 필터 추가`
+커밋 메시지는 한국어로 작성한다.
 
 ---
 

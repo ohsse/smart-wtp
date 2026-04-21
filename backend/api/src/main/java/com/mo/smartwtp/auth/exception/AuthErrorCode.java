@@ -11,9 +11,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AuthErrorCode implements ErrorCode {
 
-    LOGIN_FAILED(401, "사용자 ID 또는 비밀번호가 올바르지 않습니다."),
-    FORBIDDEN(403, "접근 권한이 없습니다.");
+    LOGIN_FAILED(401),
+    FORBIDDEN(403);
 
     private final int httpStatus;
-    private final String message;
 }

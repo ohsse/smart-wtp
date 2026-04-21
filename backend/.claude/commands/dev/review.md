@@ -36,6 +36,7 @@
 - [ ] Swagger 어노테이션 (`@Tag`, `@Operation`, `@ApiResponses`)
 - [ ] `CommonResponseDto` 응답 형태
 - [ ] `RestApiException` + `ErrorCode` enum 사용
+- [ ] `ErrorCode` 구현 enum 필드 구성 점검 — `httpStatus`만 허용, `String` 타입 필드(`message` 등) 금지 (`.claude/rules/exception-patterns.md` 참조)
 - [ ] 민감 정보 하드코딩 여부
 - [ ] 네이밍 컨벤션 준수
 - [ ] 패키지 구조 (feature-based 도메인 중심)
