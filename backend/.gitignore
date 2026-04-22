@@ -10,3 +10,4 @@ out/
 .DS_Store
 Thumbs.db
 /.gradle-user/**
+bash.exe.stackdump

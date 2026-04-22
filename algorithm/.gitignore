@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# 테스트·캐시
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# 로그·임시 출력
+logs/
+tmp_out/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+bash.exe.stackdump
+.DS_Store
+Thumbs.db
+
+# 모델 아티팩트는 보존 (*.keras, *.pkl 포함)
+# 필요 시 하위 디렉토리별로 .gitignore 추가

@@ -1,0 +1,18 @@
+PMS 정수장 실행
+
+1. PMS_db_0111.sql #DB create
+
+2. pip install -r requirements.txt #lib install
+
+3. smartwater_PMS/config/config.yaml # 파일을 수정
+	database:
+	  db_ip: # DB ip 주소 입력
+	  db_port: # port 입력
+	  db_name: pms_PMS
+	  db_id: # ID 입력
+	  db_pw: # PW 입력
+	  
+4. smartwater_PMS/PMS/diagnosis/main.py # main 파일 실행
+
+5. pms_PMS/tb_ai_diag_motor  # 해당 테이블에서 결과 값 확인 (20step은 0으로 고정)
+   pms_PMS/tb_ai_diag_pump

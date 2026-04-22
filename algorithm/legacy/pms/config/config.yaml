@@ -1,0 +1,70 @@
+database:
+  db_ip: 10.169.1.16  # DB ip 주소 입력
+  db_port: 3306      # port 입력
+  db_name: PMS_DB
+  db_id: pms_user        # ID
+  db_pw: 'pms2023'       # PW
+
+PMS_mapping:
+  CH0: P_pump_1_NDE
+  CH1: P_pump_1_DE
+  CH2: P_motor_1_DE
+  CH3: P_motor_1_NDE
+  
+  CH4: P_pump_2_NDE
+  CH5: P_pump_2_DE
+  CH6: P_motor_2_DE
+  CH7: P_motor_2_NDE
+  
+  CH8: P_pump_3_NDE
+  CH9: P_pump_3_DE
+  CH10: P_motor_3_DE
+  CH11: P_motor_3_NDE
+  
+  CH12: P_pump_4_NDE
+  CH13: P_pump_4_DE
+  CH14: P_motor_4_DE
+  CH15: P_motor_4_NDE
+  
+  CH16: P_pump_5_NDE
+  CH17: P_pump_5_DE
+  CH18: P_motor_5_DE
+  CH19: P_motor_5_NDE
+  
+  CH20: P_pump_6_NDE
+  CH21: P_pump_6_DE
+  CH22: P_motor_6_DE
+  CH23: P_motor_6_NDE
+
+
+frequency:
+  pump_scada_01: 59.45
+  pump_scada_02: 59.45
+  pump_scada_03: 59.45
+  pump_scada_04: 59.45
+  pump_scada_05: 59.45
+  pump_scada_06: 59.45
+  
+on_off:
+  motor_01: pump_scada_01
+  motor_02: pump_scada_02
+  motor_03: pump_scada_03
+  motor_04: pump_scada_04
+  motor_05: pump_scada_05
+  motor_06: pump_scada_06
+
+motor:
+  m_HY_01: motor_01
+  m_HY_02: motor_02
+  m_HY_03: motor_03
+  m_HY_04: motor_04
+  m_HY_05: motor_05
+  m_HY_06: motor_06
+
+pump:
+  p_HY_01: motor_01
+  p_HY_02: motor_02
+  p_HY_03: motor_03
+  p_HY_04: motor_04
+  p_HY_05: motor_05
+  p_HY_06: motor_06

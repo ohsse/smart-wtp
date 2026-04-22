@@ -22,7 +22,7 @@ echo "$input" | grep -q 'git commit' || exit 0
 
 # ── 경로 설정 ──
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-TASKS_DIR="$REPO_ROOT/backend/docs/tasks"
+TASKS_DIR="$REPO_ROOT/algorithm/docs/tasks"
 [ ! -d "$TASKS_DIR" ] && exit 0
 
 # ── staged 파일 목록 수집 ──
@@ -46,7 +46,8 @@ while IFS= read -r -d '' task_file; do
     while IFS= read -r file_path; do
         [[ "$file_path" == ./* ]] && continue
         [[ "$file_path" == *gradlew* ]] && continue
-        full="backend/$file_path"
+        [[ "$file_path" == *pytest* ]] && continue
+        full="algorithm/$file_path"
         for s in "${staged_files[@]}"; do
             [ "$s" = "$full" ] && { matches+=("$full|$task_slug"); break; }
         done

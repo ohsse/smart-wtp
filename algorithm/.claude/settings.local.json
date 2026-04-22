@@ -1,0 +1,30 @@
+{
+  "model": "opusplan",
+  "effortLevel": "max",
+  "permissions": {
+    "allow": [
+      "Bash(git config:*)",
+      "Bash(git:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python -m alg.*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(find C:/dev/workspace/smart-wtp-codex/algorithm/alg -name *.py -type f)",
+      "Bash(find C:/dev/workspace/smart-wtp-codex/algorithm/legacy -name *.py -type f)",
+      "Bash(cd ../backend && ./gradlew.bat :scheduler:bootRun)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-task-unstage.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
